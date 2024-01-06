@@ -1,9 +1,8 @@
 #' Compute the defined variables
-#' 
+#'
 #' @param components a list with the variables, coefficients and sets
 
 compute_variables <- function(components) {
-  
   # TODO: convert and use named arrays
 
   variables <- components$variables
@@ -11,15 +10,14 @@ compute_variables <- function(components) {
   sets <- components$sets
 
   res <- with(c(variables, coefficients, sets), {
-
     n_com <- length(COM)
-    
+
     imp <- which(SRC %in% "imp")
     p[, imp] <- pfimp[] * phi[]
 
     SIGMA <- as.vector(SIGMA)
 
-    for (u in 1:length(LOCUSR)) {
+    for (u in seq_along(LOCUSR)) {
       # CES
       ces_pcomp <-
         (rowSums(USE[, , u] / USE_S[, u] * p[]^(1 - SIGMA[])))^(1 / (1 - SIGMA))
@@ -31,7 +29,7 @@ compute_variables <- function(components) {
     }
 
     # solve ptot
-    for (l in 1:length(LOCFIN)) {
+    for (l in seq_along(LOCFIN)) {
       ll <- which(LOCUSR %in% LOCFIN[l])
       ptot[l] <- prod(pcomp[, ll]^(USE_S[, ll] / COSTS[ll]))
     }
@@ -40,12 +38,12 @@ compute_variables <- function(components) {
     # 2 = Labor
     # solve pfac
     hou <- which(LOCFIN %in% "Hou")
-    for (f in 1:length(FAC)) {
+    for (f in seq_along(FAC)) {
       pfac[f, ] <- ptot[hou] * ffac[f, ] * ffac_i[f]
     }
 
     # solve pfac_f
-    for (i in 1:length(IND)) {
+    for (i in seq_along(IND)) {
       pfac_f[i] <-
         sum(
           (FACTOR[, i] / VALADD[i]) * (pfac[, i] * afac[, i])^(1 - 0.5)
@@ -53,7 +51,7 @@ compute_variables <- function(components) {
     }
 
     # solve xfac
-    for (f in 1:length(FAC)) {
+    for (f in seq_along(FAC)) {
       xfac[f, ] <- z[] * afac[f, ] * (pfac[f, ] * afac[f, ] / pfac_f[])^(-0.5)
     }
 
@@ -61,7 +59,7 @@ compute_variables <- function(components) {
     wtot[] <- ftot[] * wgdpinc[]
 
     # solve xtot
-    for (l in 1:length(LOCFIN)) {
+    for (l in seq_along(LOCFIN)) {
       xtot[l] <- wtot[l] / ptot[l]
     }
 
@@ -74,7 +72,7 @@ compute_variables <- function(components) {
     xgdp <- sqrt(xgdp_l * xgdp_p)
 
     # solve xcomp
-    for (u in 1:length(LOCUSR)) {
+    for (u in seq_along(LOCUSR)) {
       if (LOCUSR[u] %in% IND) {
         i <- which(LOCUSR[u] %in% IND)
         xcomp[, u] <- z[u]
@@ -85,8 +83,8 @@ compute_variables <- function(components) {
     }
 
     # solve x
-    for (c in 1:length(COM)) {
-      for (s in 1:length(SRC)) {
+    for (c in seq_along(COM)) {
+      for (s in seq_along(SRC)) {
         x[c, s, ] <- xcomp[c, ] * (p[c, s] / pcomp[c, ])^(-SIGMA[c])
       }
     }
@@ -98,7 +96,7 @@ compute_variables <- function(components) {
     # solve xdem
     expusr <- which(USR == "Exp")
     locusr <- which(USR %in% LOCUSR)
-    for (s in 1:length(SRC)) {
+    for (s in seq_along(SRC)) {
       xdem[, s] <- 1 / SALES[, s] * (
         rowSums(USE[, s, locusr] * x[, s, locusr]) +
           USE[, s, expusr] * xexp[]

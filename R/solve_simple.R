@@ -58,7 +58,7 @@ solve_simple <- function(components) {
 
   # Update variables
   n_com <- length(sets$COM)
-  variables$ffac_i[] <- x0[1]
+  variables$ffac_i[2] <- x0[1]
   variables$ffac[1, ] <- x0[2:(1 + n_com)]
   x0 <- x0[-(1:(n_com + 1))]
   variables$p[, 1] <- x0[1:n_com]
